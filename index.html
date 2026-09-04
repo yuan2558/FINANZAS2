@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador de Finanzas Personales</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .resumen-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .card .amount {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .card.ingresos .amount { color: var(--success); }
+        .card.gastos .amount { color: var(--danger); }
+        .card.balance .amount { color: var(--primary); }
+
+        .form-container, .table-container {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .input-group input, .input-group select {
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        .btn-eliminar {
+            background-color: var(--danger);
+            padding: 5px 10px;
+            font-size: 0.85rem;
+        }
+
+        .tipo-ingreso { color: var(--success); font-weight: bold; }
+        .tipo-gasto { color: var(--danger); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Mi Gestor Financiero</h1>
+            <p>Controla tus ingresos y gastos de forma sencilla</p>
+        </header>
+
+        <!-- Tarjetas de Resumen -->
+        <div class="resumen-cards">
+            <div class="card ingresos">
+                <h3>Ingresos Totales</h3>
+                <p id="totalIngresos" class="amount">$0.00</p>
+            </div>
+            <div class="card gastos">
+                <h3>Gastos Totales</h3>
+                <p id="totalGastos" class="amount">$0.00</p>
+            </div>
+            <div class="card balance">
+                <h3>Balance Actual</h3>
+                <p id="totalBalance" class="amount">$0.00</p>
+            </div>
+        </div>
+
+        <!-- Formulario de Registro -->
+        <div class="form-container">
+            <h3>Agregar Nuevo Movimiento</h3>
+            <form id="transaccionForm" class="form-grid">
+                <div class="input-group">
+                    <label for="descripcion">Descripción</label>
+                    <input type="text" id="descripcion" placeholder="Ej. Salario, Supermercado" required>
+                </div>
+                <div class="input-group">
+                    <label for="monto">Monto ($)</label>
+                    <!-- Cambiado a text para permitir formato de miles mientras se escribe -->
+                    <input type="text" id="monto" placeholder="Ej. 50.000" required>
+                </div>
+                <div class="input-group">
+                    <label for="tipo">Tipo</label>
+                    <select id="tipo">
+                        <option value="ingreso">Ingreso</option>
+                        <option value="gasto">Gasto</option>
+                    </select>
+                </div>
+                <button type="submit">Agregar</button>
+            </form>
+        </div>
+
+        <!-- Tabla de Historial -->
+        <div class="table-container">
+            <h3>Historial de Movimientos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Monto</th>
+                        <th>Tipo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaMovimientos">
+                    <!-- Los datos se cargan dinámicamente con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('transaccionForm');
+        const descripcionInput = document.getElementById('descripcion');
+        const montoInput = document.getElementById('monto');
+        const tipoInput = document.getElementById('tipo');
+        const tablaMovimientos = document.getElementById('tablaMovimientos');
+        const totalIngresosElem = document.getElementById('totalIngresos');
+        const totalGastosElem = document.getElementById('totalGastos');
+        const totalBalanceElem = document.getElementById('totalBalance');
+
+        let transacciones = JSON.parse(localStorage.getItem('transacciones')) || [];
+
+        // Formatear números con separador de miles
+        function formatearMoneda(valor) {
+            return Number(valor).toLocaleString('es-CO', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Auto-formatear el input de monto mientras el usuario escribe
+        montoInput.addEventListener('input', (e) => {
+            let valor = e.target.value.replace(/\D/g, ''); // Remover todo lo que no sea dígito
+            if (valor !== '') {
+                valor = Number(valor).toLocaleString('es-CO');
+            }
+            e.target.value = valor;
+        });
+
+        function actualizarDatos() {
+            tablaMovimientos.innerHTML = '';
+            let ingresos = 0;
+            let gastos = 0;
+
+            transacciones.forEach((t, index) => {
+                const fila = document.createElement('tr');
+                
+                if (t.tipo === 'ingreso') {
+                    ingresos += t.monto;
+                } else {
+                    gastos += t.monto;
+                }
+
+                fila.innerHTML = `
+                    <td>${t.descripcion}</td>
+                    <td>$${formatearMoneda(t.monto)}</td>
+                    <td class="${t.tipo === 'ingreso' ? 'tipo-ingreso' : 'tipo-gasto'}">
+                        ${t.tipo.charAt(0).toUpperCase() + t.tipo.slice(1)}
+                    </td>
+                    <td><button class="btn-eliminar" onclick="eliminarTransaccion(${index})">Eliminar</button></td>
+                `;
+                tablaMovimientos.appendChild(fila);
+            });
+
+            const balance = ingresos - gastos;
+
+            totalIngresosElem.textContent = `$${formatearMoneda(ingresos)}`;
+            totalGastosElem.textContent = `$${formatearMoneda(gastos)}`;
+            totalBalanceElem.textContent = `$${formatearMoneda(balance)}`;
+
+            localStorage.setItem('transacciones', JSON.stringify(transacciones));
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Limpiar los puntos de miles antes de guardarlo como número puro
+            const montoLimpio = parseFloat(montoInput.value.replace(/\./g, '').replace(',', '.'));
+
+            const nuevaTransaccion = {
+                descripcion: descripcionInput.value,
+                monto: montoLimpio,
+                tipo: tipoInput.value
+            };
+
+            transacciones.push(nuevaTransaccion);
+            actualizarDatos();
+            form.reset();
+        });
+
+        function eliminarTransaccion(index) {
+            transacciones.splice(index, 1);
+            actualizarDatos();
+        }
+
+        actualizarDatos();
+    </script>
+</body>
+</html>
